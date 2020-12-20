@@ -12,44 +12,65 @@ import {
   checkRows,
   checkColumns,
   checkDiagonal,
+  checkDraw,
 } from '@/hooks/checkWinner';
 import {
-  ref,
   onMounted,
-  reactive,
   inject,
+  watch,
 } from 'vue';
 
 export default {
   setup() {
     const WINNER = inject('WINNER');
-    const nowPlayer = ref('player1');
-    const deckArray = reactive([
-      [null, null, null],
-      [null, null, null],
-      [null, null, null],
-    ]);
+    const FINISH = inject('FINISH');
+    const NOW_PLAYER = inject('NOW_PLAYER');
+    const DECK_ARRAY = inject('DECK_ARRAY');
+    const PLAYER_STAT = inject('PLAYER_STAT');
 
     const checkWinner = () => {
       const columnList = [[], [], []];
       const diagonalList = [[], []];
       let winner = null;
 
-      makeColumns(deckArray, columnList);
-      makeDiagonals(deckArray, diagonalList);
+      // 將整理好的 columns 與 disgonals 存入上方變數
+      makeColumns(DECK_ARRAY.value, columnList);
+      makeDiagonals(DECK_ARRAY.value, diagonalList);
 
       const checkTasks = [
         checkDiagonal(diagonalList),
         checkColumns(columnList),
-        checkRows(deckArray),
+        checkRows(DECK_ARRAY.value),
+        checkDraw(DECK_ARRAY),
       ];
 
+      // 若 checkTasks 其中一個條件產生贏家或平手，則 winner 為 return 的值，否則 winner = null。
       checkTasks.forEach((result) => {
         if (result) winner = result;
       });
 
       return winner;
     };
+
+    watch(WINNER, (newWinner) => {
+      // 若分出勝負，則結束當局遊戲，並顯示結果(Result.vue)
+      if (newWinner) {
+        FINISH.value = true;
+
+        // 計分。贏家 +1 分，平手各 +1 分。
+        if (newWinner === 'player1') {
+          PLAYER_STAT.value.player1 += 1;
+        } else if (newWinner === 'player2') {
+          PLAYER_STAT.value.player2 += 1;
+        } else if (newWinner === 'draw') {
+          PLAYER_STAT.value.player1 += 1;
+          PLAYER_STAT.value.player2 += 1;
+        }
+
+        // 將記分板存入 localStorage
+        localStorage.setItem('PLAYER_STAT', JSON.stringify(PLAYER_STAT.value));
+      }
+    });
 
     onMounted(() => {
       const deck = document.getElementsByClassName('deck')[0];
@@ -58,23 +79,35 @@ export default {
       deck.addEventListener('click', (event) => {
         if (event.target.classList.contains('square')) {
           const clickPosition = parseInt(event.target.dataset.value, 10) + 1;
+          // clickPosition:
+          // 1 | 2 | 3
+          // 4 | 5 | 6
+          // 7 | 8 | 9
 
+          // 將 row 與 column 以 clickPosition 轉換成 0 base 的 index，並應用在更改 DECK_ARRAY 的值。
           const row = Math.ceil(clickPosition / 3) - 1;
           const column = clickPosition % 3 === 0 ? 3 : clickPosition % 3;
 
+          // 若方格內尚未添加除了 square 以外的 class，則可添加 css class (cross, circle) 以及更改 DECK_ARRAY
           if (event.target.classList.length <= 1) {
-            if (nowPlayer.value === 'player1') squareList[clickPosition - 1].classList.add('cross');
-            if (nowPlayer.value === 'player2') squareList[clickPosition - 1].classList.add('circle');
-            deckArray[row][column - 1] = nowPlayer.value;
+            if (NOW_PLAYER.value === 'player1') {
+              // 操控畫面以及同步 DECK_ARRAY 狀態
+              squareList[clickPosition - 1].classList.add('cross');
+              DECK_ARRAY.value[row][column - 1] = NOW_PLAYER.value;
+              // 交換遊玩者順序
+              NOW_PLAYER.value = 'player2';
+            } else if (NOW_PLAYER.value === 'player2') {
+              squareList[clickPosition - 1].classList.add('circle');
+              DECK_ARRAY.value[row][column - 1] = NOW_PLAYER.value;
+              NOW_PLAYER.value = 'player1';
+            }
           }
         }
 
-        if (nowPlayer.value === 'player1') {
-          nowPlayer.value = 'player2';
-        } else {
-          nowPlayer.value = 'player1';
-        }
-
+        // 每占領一次，檢查一次
+        // 尚未分出勝負責 return null
+        // 其中一方獲勝則 return 'player1' 或 'plaey2'
+        // 平手則 return 'draw'
         WINNER.value = checkWinner();
       });
     });

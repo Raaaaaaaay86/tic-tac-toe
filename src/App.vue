@@ -11,7 +11,6 @@ import {
   ref,
   provide,
   watchEffect,
-  watch,
 } from 'vue';
 
 export default {
@@ -23,18 +22,33 @@ export default {
   setup() {
     const page = ref(0);
     const winner = ref(null);
+    const finish = ref(false);
+    const nowPlayer = ref('player1');
+    const deckArray = ref([
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+    ]);
+    const playerStat = ref({
+      player1: 0,
+      player2: 0,
+    });
 
     provide('PAGE', page);
     provide('WINNER', winner);
+    provide('FINISH', finish);
+    provide('DECK_ARRAY', deckArray);
+    provide('NOW_PLAYER', nowPlayer);
+    provide('PLAYER_STAT', playerStat);
+
+    const localStoragePlayerStat = JSON.parse(localStorage.getItem('PLAYER_STAT'));
+    if (localStoragePlayerStat) playerStat.value = localStoragePlayerStat;
 
     watchEffect(() => {
       const html = document.getElementsByTagName('html');
+      // 依照頁面切換背景色
       if (page.value === 0) html[0].style.backgroundColor = '#000';
       if (page.value === 1) html[0].style.backgroundColor = '#FF6D70';
-    });
-
-    watch(winner, (newValue) => {
-      if (newValue) console.log(`${newValue} IS THE WINNER`);
     });
 
     return {

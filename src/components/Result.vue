@@ -1,18 +1,25 @@
 <template lang="pug">
-div(class="winner player1" v-if="WINNER")
+div(class="winner" id="showWinner" v-if="WINNER === 'player1' || WINNER === 'player2'")
   h1 winner!
-div(class="draw-circle" v-if="!WINNER")
+div(class="draw-circle" v-if="WINNER === 'draw'")
   - for (let i = 0; i < 3; i++)
     h1 draw!
   div.draw-cross
 </template>
 
 <script>
-import { inject } from 'vue';
+import { inject, onMounted } from 'vue';
 
 export default {
   setup() {
     const WINNER = inject('WINNER');
+
+    onMounted(() => {
+      // 操控 .winner classList 來顯示正確贏家。
+      const showWinner = document.getElementById('showWinner');
+      if (WINNER.value === 'player1') showWinner.classList.add('player1');
+      if (WINNER.value === 'player2') showWinner.classList.add('player2');
+    });
 
     return {
       WINNER,

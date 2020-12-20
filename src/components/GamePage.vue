@@ -2,19 +2,19 @@
 div.wrapper-game
   div.scoreBoard
     div.scoreBoard-playerA
-    div.scoreBoard-scoreA 10
+    div.scoreBoard-scoreA {{ PLAYER_STAT.player1 }}
     div.scoreBoard-vs vs
-    div.scoreBoard-scoreB 8
+    div.scoreBoard-scoreB {{ PLAYER_STAT.player2 }}
     div.scoreBoard-playerB
-  Deck(v-if="!finish")
-  Result(v-if="finish")
-  div(class="restartBtn") restart
+  Deck(v-if="!FINISH")
+  Result(v-if="FINISH")
+  div(class="restartBtn" @click="resetGame()") restart
 </template>
 
 <script>
 import Deck from '@/components/Deck.vue';
 import Result from '@/components/Result.vue';
-import { ref } from 'vue';
+import { inject } from 'vue';
 
 export default {
   components: {
@@ -22,10 +22,40 @@ export default {
     Deck,
   },
   setup() {
-    const finish = ref(false);
+    const FINISH = inject('FINISH');
+    const DECK_ARRAY = inject('DECK_ARRAY');
+    const NOW_PLAYER = inject('NOW_PLAYER');
+    const PLAYER_STAT = inject('PLAYER_STAT');
+
+    const resetGame = () => {
+      const squares = document.getElementsByClassName('square');
+
+      if (!FINISH.value) {
+        // 清除井字上所有樣式(cross, circle.), 並復歸遊戲者順序為 player1
+        squares.forEach((square) => {
+          square.classList.remove('circle');
+          square.classList.remove('cross');
+          NOW_PLAYER.value = 'player1';
+        });
+      } else {
+        // Result.vue 出現時 Deck.vue 已被 Destroyed，復歸狀態即可。
+        FINISH.value = false;
+        NOW_PLAYER.value = 'player1';
+      }
+
+      // 復歸九宮格
+      DECK_ARRAY.value = [
+        [null, null, null],
+        [null, null, null],
+        [null, null, null],
+      ];
+    };
 
     return {
-      finish,
+      DECK_ARRAY,
+      PLAYER_STAT,
+      resetGame,
+      FINISH,
     };
   },
 };

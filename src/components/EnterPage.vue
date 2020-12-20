@@ -27,6 +27,7 @@ export default {
   setup() {
     const PAGE = inject('PAGE');
 
+    // 跳轉頁面
     const startGame = () => {
       PAGE.value = 1;
     };

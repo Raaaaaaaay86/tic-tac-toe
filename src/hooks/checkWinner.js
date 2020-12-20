@@ -50,10 +50,23 @@ const checkDiagonal = (diagonalList) => {
   return winner;
 };
 
+const checkDraw = (deck) => {
+  let occupied = 0;
+
+  deck.value.forEach((row) => {
+    row.forEach((col) => {
+      if (col) occupied += 1;
+    });
+  });
+
+  return occupied === 9 ? 'draw' : null;
+};
+
 export {
   makeColumns,
   makeDiagonals,
   checkRows,
   checkColumns,
   checkDiagonal,
+  checkDraw,
 };
