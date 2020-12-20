@@ -38,6 +38,9 @@ export default {
   font-style: italic;
   -webkit-text-stroke-width: 4px;
   -webkit-text-stroke-color: white;
+  @media (max-width: 640px) {
+    font-size: 80px;
+  }
   &.player1 {
     position: relative;
     &::after {
@@ -76,6 +79,10 @@ export default {
       border-radius: 50%;
       z-index: -1;
       transform: translate(-50%, -50%);
+      @media (max-width: 768px) {
+        width: 230px;
+        height: 230px;
+      }
     }
   }
 }
