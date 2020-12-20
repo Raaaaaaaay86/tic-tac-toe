@@ -11,6 +11,7 @@ import {
   ref,
   provide,
   watchEffect,
+  watch,
 } from 'vue';
 
 export default {
@@ -30,6 +31,10 @@ export default {
       const html = document.getElementsByTagName('html');
       if (page.value === 0) html[0].style.backgroundColor = '#000';
       if (page.value === 1) html[0].style.backgroundColor = '#FF6D70';
+    });
+
+    watch(winner, (newValue) => {
+      if (newValue) console.log(`${newValue} IS THE WINNER`);
     });
 
     return {

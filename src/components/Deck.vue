@@ -1,9 +1,86 @@
 <template lang="pug">
 div.deck
   - for (var i = 0; i < 9; i++) {
-    div.square.cross
+    div(class="square" data-value = i)
   - }
 </template>
+
+<script>
+import {
+  makeColumns,
+  makeDiagonals,
+  checkRows,
+  checkColumns,
+  checkDiagonal,
+} from '@/hooks/checkWinner';
+import {
+  ref,
+  onMounted,
+  reactive,
+  inject,
+} from 'vue';
+
+export default {
+  setup() {
+    const WINNER = inject('WINNER');
+    const nowPlayer = ref('player1');
+    const deckArray = reactive([
+      [null, null, null],
+      [null, null, null],
+      [null, null, null],
+    ]);
+
+    const checkWinner = () => {
+      const columnList = [[], [], []];
+      const diagonalList = [[], []];
+      let winner = null;
+
+      makeColumns(deckArray, columnList);
+      makeDiagonals(deckArray, diagonalList);
+
+      const checkTasks = [
+        checkDiagonal(diagonalList),
+        checkColumns(columnList),
+        checkRows(deckArray),
+      ];
+
+      checkTasks.forEach((result) => {
+        if (result) winner = result;
+      });
+
+      return winner;
+    };
+
+    onMounted(() => {
+      const deck = document.getElementsByClassName('deck')[0];
+      const squareList = document.getElementsByClassName('square');
+
+      deck.addEventListener('click', (event) => {
+        if (event.target.classList.contains('square')) {
+          const clickPosition = parseInt(event.target.dataset.value, 10) + 1;
+
+          const row = Math.ceil(clickPosition / 3) - 1;
+          const column = clickPosition % 3 === 0 ? 3 : clickPosition % 3;
+
+          if (event.target.classList.length <= 1) {
+            if (nowPlayer.value === 'player1') squareList[clickPosition - 1].classList.add('cross');
+            if (nowPlayer.value === 'player2') squareList[clickPosition - 1].classList.add('circle');
+            deckArray[row][column - 1] = nowPlayer.value;
+          }
+        }
+
+        if (nowPlayer.value === 'player1') {
+          nowPlayer.value = 'player2';
+        } else {
+          nowPlayer.value = 'player1';
+        }
+
+        WINNER.value = checkWinner();
+      });
+    });
+  },
+};
+</script>
 
 <style lang="scss" scoped>
 .deck {
@@ -22,7 +99,6 @@ div.deck
     display: flex;
     justify-content: center;
     align-items: center;
-    box-sizing: content-box;
     cursor: pointer;
     &:nth-of-type(5){
       border: 8px solid #ED494C;
@@ -45,6 +121,10 @@ div.deck
     height: 60px;
     border: 8px solid #000;
     border-radius: 50%;
+    @media (max-width: 640px) {
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 
