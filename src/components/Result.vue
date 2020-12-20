@@ -99,6 +99,9 @@ export default {
     user-select: none;
     -webkit-text-stroke-width: 4px;
     -webkit-text-stroke-color: white;
+    @media (max-width: 768px) {
+      font-size: 80px;
+    }
     &::after {
       content: '';
       position: absolute;
@@ -110,6 +113,11 @@ export default {
       border: 32px solid #ED494C;
       transform: translate(75%, -50%);
       z-index: -1;
+      @media (max-width: 640px) {
+        width: 80px;
+        height: 80px;
+        right: 30%;
+      }
     }
   }
   &-cross {
@@ -123,6 +131,10 @@ export default {
       background-color: #ED494C;
       transform: translate(0%, -50%) rotate(45deg);
       z-index: -1;
+      @media (max-width: 640px) {
+        height: 180px;
+        left: 6%;
+      }
     }
     &::before {
       content: '';
@@ -134,6 +146,10 @@ export default {
       background-color: #ED494C;
       transform: translate(0%, -50%) rotate(-45deg);
       z-index: -1;
+      @media (max-width: 640px) {
+        height: 180px;
+        left: 6%;
+      }
     }
   }
 }
