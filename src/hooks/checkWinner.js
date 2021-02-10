@@ -13,17 +13,17 @@ const makeColumns = (deck) => {
 const makeDiagonals = (deck) => {
   const diagonalList = [[], []];
 
-  for (let i = 0; i < 2; i += 1) {
-    let k = 0;
-    let q = 2;
+  for (let indexForDiagonalList = 0; indexForDiagonalList < 2; indexForDiagonalList += 1) {
+    let indexForLeftToRightDiagonal = 0;
+    let indexForRightToLeftDiagonal = 2;
 
-    for (let j = 0; j < deck.length; j += 1) {
-      if (i === 1) {
-        diagonalList[i].push(deck[j][q]);
-        q -= 1;
+    for (let deckRowIndex = 0; deckRowIndex < deck.length; deckRowIndex += 1) {
+      if (indexForDiagonalList === 0) {
+        diagonalList[indexForDiagonalList].push(deck[deckRowIndex][indexForLeftToRightDiagonal]);
+        indexForLeftToRightDiagonal += 1;
       } else {
-        diagonalList[i].push(deck[j][k]);
-        k += 1;
+        diagonalList[indexForDiagonalList].push(deck[deckRowIndex][indexForRightToLeftDiagonal]);
+        indexForRightToLeftDiagonal -= 1;
       }
     }
   }
