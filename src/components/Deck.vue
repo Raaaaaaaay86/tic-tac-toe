@@ -7,13 +7,9 @@ div.deck
 
 <script>
 import {
-  makeColumns,
-  makeDiagonals,
-  checkRows,
-  checkColumns,
-  checkDiagonal,
-  checkDraw,
+  checkWinner,
 } from '@/hooks/checkWinner';
+
 import {
   onMounted,
   inject,
@@ -27,30 +23,6 @@ export default {
     const NOW_PLAYER = inject('NOW_PLAYER');
     const DECK_ARRAY = inject('DECK_ARRAY');
     const PLAYER_STAT = inject('PLAYER_STAT');
-
-    const checkWinner = () => {
-      const columnList = [[], [], []];
-      const diagonalList = [[], []];
-      let winner = null;
-
-      // 將整理好的 columns 與 disgonals 存入上方變數
-      makeColumns(DECK_ARRAY.value, columnList);
-      makeDiagonals(DECK_ARRAY.value, diagonalList);
-
-      const checkTasks = [
-        checkDiagonal(diagonalList),
-        checkColumns(columnList),
-        checkRows(DECK_ARRAY.value),
-        checkDraw(DECK_ARRAY),
-      ];
-
-      // 若 checkTasks 其中一個條件產生贏家或平手，則 winner 為 return 的值，否則 winner = null。
-      checkTasks.forEach((result) => {
-        if (result) winner = result;
-      });
-
-      return winner;
-    };
 
     watch(WINNER, (newWinner) => {
       // 若分出勝負，則結束當局遊戲，並顯示結果(Result.vue)
@@ -76,7 +48,7 @@ export default {
       const deck = document.getElementsByClassName('deck')[0];
       const squareList = document.getElementsByClassName('square');
 
-      deck.addEventListener('click', (event) => {
+      deck.addEventListener('click', (event) => { // 添加 O 或 Ｘ 時觸發
         if (event.target.classList.contains('square')) {
           const clickPosition = parseInt(event.target.dataset.value, 10) + 1;
           // clickPosition:
@@ -106,9 +78,9 @@ export default {
 
         // 每占領一次，檢查一次
         // 尚未分出勝負責 return null
-        // 其中一方獲勝則 return 'player1' 或 'plaey2'
+        // 其中一方獲勝則 return 'player1' 或 'player2'
         // 平手則 return 'draw'
-        WINNER.value = checkWinner();
+        WINNER.value = checkWinner(DECK_ARRAY.value);
       });
     });
   },
