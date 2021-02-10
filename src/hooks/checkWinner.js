@@ -49,7 +49,6 @@ const checkDraw = (deck) => {
     });
   });
 
-  console.log(occupied);
   return occupied === 9 ? 'draw' : null;
 };
 
