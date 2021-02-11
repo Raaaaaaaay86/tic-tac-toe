@@ -13,17 +13,17 @@ const makeColumns = (deck) => {
 const makeDiagonals = (deck) => {
   const diagonalList = [[], []];
 
-  for (let indexForDiagonalList = 0; indexForDiagonalList < 2; indexForDiagonalList += 1) {
-    let indexForLeftToRightDiagonal = 0;
-    let indexForRightToLeftDiagonal = 2;
+  for (let indexOfDiagonal = 0; indexOfDiagonal < 2; indexOfDiagonal += 1) {
+    let indexLTR = 0;
+    let indexRTL = 2;
 
     for (let deckRowIndex = 0; deckRowIndex < deck.length; deckRowIndex += 1) {
-      if (indexForDiagonalList === 0) {
-        diagonalList[indexForDiagonalList].push(deck[deckRowIndex][indexForLeftToRightDiagonal]);
-        indexForLeftToRightDiagonal += 1;
+      if (indexOfDiagonal === 0) {
+        diagonalList[indexOfDiagonal].push(deck[deckRowIndex][indexLTR]);
+        indexLTR += 1;
       } else {
-        diagonalList[indexForDiagonalList].push(deck[deckRowIndex][indexForRightToLeftDiagonal]);
-        indexForRightToLeftDiagonal -= 1;
+        diagonalList[indexOfDiagonal].push(deck[deckRowIndex][indexRTL]);
+        indexRTL -= 1;
       }
     }
   }
@@ -68,7 +68,7 @@ const checkWinner = (deck) => {
     const result = checkTasks[i];
     if (result) {
       winner = result;
-      break; // 贏家產生則不再檢查
+      break; // 贏家產生則跳出迴圈不再檢查
     }
   }
 
